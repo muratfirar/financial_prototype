@@ -2,9 +2,16 @@
 """
 Local development server starter
 """
-import uvicorn
 import os
 import sys
+
+try:
+    import uvicorn
+except ImportError:
+    print("❌ Error: uvicorn is not installed")
+    print("📦 Installing required dependencies...")
+    os.system("pip install uvicorn[standard]==0.24.0 fastapi==0.104.1 sqlalchemy==2.0.23 python-multipart==0.0.6 pydantic==2.5.0")
+    import uvicorn
 
 if __name__ == "__main__":
     print("🚀 Starting Financial Risk Management Platform - Local Backend")
@@ -13,9 +20,9 @@ if __name__ == "__main__":
     print("❤️ Health Check: http://localhost:8000/health")
     print()
     
-    # Change to backend directory
-    backend_dir = os.path.dirname(os.path.abspath(__file__))
-    os.chdir(backend_dir)
+    # Ensure we're in the correct directory
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    os.chdir(script_dir)
     
     # Run the server
     uvicorn.run(
@@ -23,5 +30,5 @@ if __name__ == "__main__":
         host="0.0.0.0",
         port=8000,
         reload=True,
-        reload_dirs=[backend_dir]
+        reload_dirs=[script_dir]
     )
