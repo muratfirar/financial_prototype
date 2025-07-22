@@ -3,22 +3,28 @@ from typing import List
 import os
 
 class Settings(BaseSettings):
+    # Project Info
+    PROJECT_NAME: str = "Financial Risk Management Platform"
+    VERSION: str = "1.0.0"
+    API_V1_STR: str = "/api/v1"
+    
     # Database
     @property
     def DATABASE_URL(self) -> str:
-        # Render.com internal database URL - use internal hostname
+        # Get database URL from environment
         db_url = os.getenv("DATABASE_URL")
         
         if not db_url:
-            # Fallback to default for local development
+            # Fallback for local development
             return "postgresql://financial_user:financial_password@localhost:5432/financial_risk_db"
         
-        # Convert external hostname to internal for Render.com
-        if "dpg-" in db_url and "-a/" in db_url:
+        # Convert external Render hostname to internal
+        if "dpg-" in db_url and not ".oregon-postgres.render.com" in db_url:
             # Replace external hostname with internal
             # External: dpg-xxx-a
             # Internal: dpg-xxx-a.oregon-postgres.render.com
-            db_url = db_url.replace("@dpg-", "@dpg-").replace("-a/", "-a.oregon-postgres.render.com/")
+            import re
+            db_url = re.sub(r'@(dpg-[^/]+)/', r'@\1.oregon-postgres.render.com/', db_url)
         
         # Handle postgres:// vs postgresql:// URL schemes
         if db_url.startswith("postgres://"):
@@ -26,8 +32,33 @@ class Settings(BaseSettings):
             
         return db_url
     
-    # JWT
-    SECRET_KEY: str = os.getenv(
-        "SECRET_KEY", 
+    # JWT Configuration
+    SECRET_KEY: str = os.getenv("SECRET_KEY", "your-super-secret-key-change-in-production")
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    
+    # Application Configuration
+    DEBUG: bool = os.getenv("DEBUG", "False").lower() == "true"
+    
+    # CORS Configuration
+    @property
+    def CORS_ORIGINS(self) -> List[str]:
+        origins = os.getenv("CORS_ORIGINS", "")
+        if origins:
+            return [origin.strip() for origin in origins.split(",")]
+        
+        # Default CORS origins
+        if self.DEBUG:
+            return [
+                "http://localhost:3000",
+                "http://localhost:5173",
+                "http://127.0.0.1:3000",
+                "http://127.0.0.1:5173"
+            ]
+        else:
+            return [
+                "https://financial-risk-frontend.onrender.com",
+                "https://*.onrender.com"
+            ]
 
 settings = Settings()
