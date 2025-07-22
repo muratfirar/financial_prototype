@@ -1,44 +1,40 @@
-# Render Blueprint for Financial Risk Management Platform
 services:
   # PostgreSQL Database
   - type: pserv
     name: financial-risk-db
-    env: docker
     plan: free
-    dockerfilePath: ./backend/Dockerfile.db
+    databaseName: financial_risk_db
+    user: financial_user
+    region: frankfurt
     
-  # Backend API
+  # Backend API (Docker)
   - type: web
     name: financial-risk-api
-    env: python
+    env: docker
     plan: free
-    buildCommand: |
-      cd backend
-      pip install -r requirements.txt
-      alembic upgrade head
-      python create_sample_data.py
-    startCommand: |
-      cd backend
-      uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    region: frankfurt
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /health
     envVars:
       - key: DATABASE_URL
-        fromService:
-          type: pserv
+        fromDatabase:
           name: financial-risk-db
           property: connectionString
       - key: SECRET_KEY
         generateValue: true
-      - key: CORS_ORIGINS
-        value: '["https://financial-risk-frontend.onrender.com"]'
+      - key: DEBUG
+        value: "False"
+      - key: PORT
+        value: "10000"
     
   # Frontend
   - type: web
     name: financial-risk-frontend
     env: static
     plan: free
-    buildCommand: |
-      npm install
-      npm run build
+    region: frankfurt
+    buildCommand: npm ci && npm run build
     staticPublishPath: ./dist
     envVars:
       - key: VITE_API_URL
