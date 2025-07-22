@@ -2,11 +2,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.api.v1 import api_router
-from app.core.database import engine
-from app.models import *  # Import all models to ensure they're registered
-
-# Create database tables
-# Base.metadata.create_all(bind=engine)  # Uncomment for development
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -36,7 +31,7 @@ def read_root():
 
 @app.get("/health")
 def health_check():
-    return {"status": "healthy", "timestamp": "2025-01-21T12:00:00Z"}
+    return {"status": "healthy"}
 
 if __name__ == "__main__":
     import uvicorn

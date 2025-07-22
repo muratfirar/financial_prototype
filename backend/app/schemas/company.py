@@ -46,8 +46,3 @@ class CompanyInDBBase(CompanyBase):
 
 class Company(CompanyInDBBase):
     pass
-
-class CompanyWithMetrics(Company):
-    equity: float
-    debt_to_equity_ratio: Optional[float] = None
-    latest_financial_metrics: Optional[dict] = None
