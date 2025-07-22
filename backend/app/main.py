@@ -40,11 +40,27 @@ def health_check():
 
 # Include API router only if database is available
 try:
+    # Test database connection first
+    from app.core.database import engine
+    from sqlalchemy import text
+    
+    with engine.connect() as conn:
+        conn.execute(text("SELECT 1"))
+    
+    print("✅ Database connection successful")
+    
     from app.api.v1 import api_router
     app.include_router(api_router, prefix=settings.API_V1_STR)
+    print("✅ API routes loaded successfully")
+    
 except Exception as e:
-    print(f"Warning: Could not load API routes: {e}")
+    print(f"❌ Could not load API routes: {e}")
     print("API will start with basic routes only")
+    
+    # Add a simple test route
+    @app.get("/api/v1/test")
+    def test_route():
+        return {"message": "API is working", "error": str(e)}
 
 if __name__ == "__main__":
     import uvicorn
