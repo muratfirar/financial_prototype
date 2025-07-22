@@ -17,16 +17,16 @@ def wait_for_db():
         print("DATABASE_URL not found, skipping database wait")
         return
     
-   # Try internal database URL first for Render
-   internal_db_url = os.getenv("INTERNAL_DATABASE_URL")
-   if internal_db_url:
-       database_url = internal_db_url
-       print(f"Using internal database URL for connection test")
-   
+    # Try internal database URL first for Render
+    internal_db_url = os.getenv("INTERNAL_DATABASE_URL")
+    if internal_db_url:
+        database_url = internal_db_url
+        print(f"Using internal database URL for connection test")
+    
     # Parse database URL
     parsed = urlparse(database_url)
-   
-   print(f"Attempting to connect to: {parsed.hostname}:{parsed.port or 5432}")
+    
+    print(f"Attempting to connect to: {parsed.hostname}:{parsed.port or 5432}")
     
     for attempt in range(max_retries):
         try:
@@ -45,7 +45,7 @@ def wait_for_db():
             print(f"Database not ready (attempt {attempt + 1}/{max_retries}): {e}")
             if attempt == max_retries - 1:
                 print("Database connection timeout")
-               print(f"Final connection attempt failed for: {parsed.hostname}")
+                print(f"Final connection attempt failed for: {parsed.hostname}")
                 raise
             time.sleep(retry_delay)
 
