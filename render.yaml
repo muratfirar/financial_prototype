@@ -38,4 +38,4 @@ services:
     staticPublishPath: ./dist
     envVars:
       - key: VITE_API_URL
-        value: https://financial-risk-api.onrender.com
+        value: https://financial-prototype-docker.onrender.com

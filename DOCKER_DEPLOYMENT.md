@@ -51,13 +51,13 @@ PORT: 10000
 
 **Environment Variables:**
 ```
-VITE_API_URL: https://financial-risk-api.onrender.com
+VITE_API_URL: https://financial-prototype-docker.onrender.com
 ```
 
 ## ✅ Test URLs
-- Backend: `https://financial-risk-api.onrender.com/health`
+- Backend: `https://financial-prototype-docker.onrender.com/health`
 - Frontend: `https://financial-risk-frontend.onrender.com`
-- API Docs: `https://financial-risk-api.onrender.com/docs`
+- API Docs: `https://financial-prototype-docker.onrender.com/docs`
 
 ## 🔑 Test Kullanıcıları
 ```

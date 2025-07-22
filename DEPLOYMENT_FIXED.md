@@ -56,13 +56,13 @@ python create_sample_data.py
 
 3. **Environment Variables:**
    ```
-   VITE_API_URL: https://financial-risk-api.onrender.com
+   VITE_API_URL: https://financial-prototype-docker.onrender.com
    ```
 
 ## 🔧 Sorun Giderme
 
-### Database URL Manuel Ayarlama
-Eğer otomatik gelmezse:
+- Backend: `https://financial-prototype-docker.onrender.com/health`
+- API Docs: `https://financial-prototype-docker.onrender.com/docs`
 1. Database servisinizin "Info" sekmesinden External Database URL'i kopyalayın
 2. Backend servisinizin Environment Variables'a ekleyin
 
