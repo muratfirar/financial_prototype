@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Building2, BarChart3, Shield, AlertTriangle, TrendingUp, FileText, Users } from 'lucide-react';
 
+// Import API_BASE_URL for debugging
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+
 // Components
 import Sidebar from './components/Layout/Sidebar';
 import Header from './components/Layout/Header';
@@ -30,25 +33,30 @@ function App() {
   // Check backend connection
   useEffect(() => {
     const checkBackend = async () => {
-      console.log('Checking backend connection...');
-      const connected = await healthCheck();
-      console.log('Backend connected:', connected);
-      setBackendConnected(connected);
-      
-      // Check if user is already authenticated
-      if (connected && authToken) {
-        try {
-          const user = await authAPI.getCurrentUser();
-          setCurrentUser(user);
-          setIsAuthenticated(true);
-        } catch (error) {
-          console.error('Failed to get current user:', error);
-          // Clear invalid token
-          authAPI.logout();
+      try {
+        console.log('Checking backend connection...');
+        const connected = await healthCheck();
+        console.log('Backend connected:', connected);
+        setBackendConnected(connected);
+        
+        // Check if user is already authenticated
+        if (connected && authToken) {
+          try {
+            const user = await authAPI.getCurrentUser();
+            setCurrentUser(user);
+            setIsAuthenticated(true);
+          } catch (error) {
+            console.error('Failed to get current user:', error);
+            // Clear invalid token
+            authAPI.logout();
+          }
         }
+      } catch (error) {
+        console.error('Backend check failed:', error);
+        setBackendConnected(false);
+      } finally {
+        setIsLoading(false);
       }
-      
-      setIsLoading(false);
     };
     checkBackend();
   }, []);
@@ -101,7 +109,14 @@ function App() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Sistem kontrol ediliyor...</p>
+          <p className="text-gray-600 mb-2">Sistem kontrol ediliyor...</p>
+          <p className="text-sm text-gray-500">Backend: {API_BASE_URL}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
+          >
+            Yeniden Dene
+          </button>
         </div>
       </div>
     );

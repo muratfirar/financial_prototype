@@ -129,11 +129,18 @@ export const dashboardAPI = {
 export const healthCheck = async () => {
   try {
     console.log('Health check URL:', `${API_BASE_URL}/health`);
-    const response = await fetch(`${API_BASE_URL}/health`);
+    const response = await fetch(`${API_BASE_URL}/health`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      // Add timeout to prevent hanging
+      signal: AbortSignal.timeout(5000)
+    });
     console.log('Health check response:', response.status, response.ok);
     return response.ok;
-  } catch {
-    console.error('Health check failed');
+  } catch (error) {
+    console.error('Health check failed:', error);
     return false;
   }
 };
