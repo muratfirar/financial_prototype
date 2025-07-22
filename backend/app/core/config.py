@@ -43,22 +43,20 @@ class Settings(BaseSettings):
     # CORS Configuration
     @property
     def CORS_ORIGINS(self) -> List[str]:
-        origins = os.getenv("CORS_ORIGINS", "")
-        if origins:
-            return [origin.strip() for origin in origins.split(",")]
-        
         # Default CORS origins
         if self.DEBUG:
             return [
                 "http://localhost:3000",
                 "http://localhost:5173",
-                "http://127.0.0.1:3000",
-                "http://127.0.0.1:5173"
+                "http://127.0.0.1:3000", 
+                "http://127.0.0.1:5173",
+                "https://financial-risk-frontend.onrender.com"
             ]
         else:
             return [
                 "https://financial-risk-frontend.onrender.com",
-                "https://*.onrender.com"
+                "https://*.onrender.com",
+                "*"
             ]
 
 settings = Settings()
