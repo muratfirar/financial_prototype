@@ -17,13 +17,20 @@ def create_database_engine():
                 print(f"Attempt {attempt + 1}: DATABASE_URL is empty, waiting...")
                 time.sleep(retry_delay)
                 continue
+           
+           print(f"Attempt {attempt + 1}: Trying to connect to database...")
+           print(f"Database URL host: {database_url.split('@')[1].split('/')[0] if '@' in database_url else 'unknown'}")
                 
             engine = create_engine(
                 database_url,
                 pool_pre_ping=True,
                 echo=settings.DEBUG,
                 pool_recycle=300,
-                pool_timeout=20
+               pool_timeout=30,
+               connect_args={
+                   "connect_timeout": 30,
+                   "application_name": "financial_risk_platform"
+               }
             )
             
             # Test connection
@@ -37,6 +44,7 @@ def create_database_engine():
             print(f"Database connection attempt {attempt + 1} failed: {e}")
             if attempt == max_retries - 1:
                 print("All database connection attempts failed")
+               print(f"Final DATABASE_URL: {settings.DATABASE_URL}")
                 raise
             time.sleep(retry_delay)
     
