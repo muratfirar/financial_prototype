@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import os
 from fastapi.security import OAuth2PasswordRequestForm
+from fastapi import Depends, HTTPException
+import os
 from pydantic import BaseModel
 from typing import Optional
 
@@ -81,11 +82,8 @@ def test_route():
 
 # Authentication endpoints
 @app.post("/api/v1/auth/login", response_model=Token)
-def login(form_data: OAuth2PasswordRequestForm = None):
+def login(form_data: OAuth2PasswordRequestForm = Depends()):
     """Login endpoint that accepts form data"""
-    if not form_data:
-        return {"detail": "Form data required"}, 400
-    
     email = form_data.username
     password = form_data.password
     
@@ -98,7 +96,6 @@ def login(form_data: OAuth2PasswordRequestForm = None):
             "token_type": "bearer"
         }
     
-    from fastapi import HTTPException
     raise HTTPException(status_code=401, detail="Incorrect email or password")
 
 @app.get("/api/v1/auth/me", response_model=User)
