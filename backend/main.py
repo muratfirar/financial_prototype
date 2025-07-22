@@ -142,21 +142,21 @@ class CompanyResponse(BaseModel):
 class CompanyCreate(BaseModel):
     name: str
     tax_id: str
-    tax_office: str
+    tax_office: Optional[str] = ""
     trade_registry_no: Optional[str] = None
     mersis_no: Optional[str] = None
-    company_type: str
+    company_type: Optional[str] = ""
     establishment_date: Optional[str] = None
-    phone: str
-    email: str
+    phone: Optional[str] = ""
+    email: Optional[str] = ""
     website: Optional[str] = None
-    address: str
-    city: str
-    district: str
-    contact_person: str
-    contact_phone: str
-    contact_email: str
-    sector: str
+    address: Optional[str] = ""
+    city: Optional[str] = ""
+    district: Optional[str] = ""
+    contact_person: Optional[str] = ""
+    contact_phone: Optional[str] = ""
+    contact_email: Optional[str] = ""
+    sector: Optional[str] = ""
     revenue: Optional[float] = 0.0
     assets: Optional[float] = 0.0
     liabilities: Optional[float] = 0.0
@@ -363,6 +363,139 @@ def init_sample_data():
                 financial_health=FinancialHealth.CRITICAL,
                 status=CompanyStatus.MONITORING,
                 last_analysis="2025-01-20"
+            ),
+            Company(
+                name="PQR Enerji A.Ş.",
+                tax_id="6789012345",
+                tax_office="Ankara Vergi Dairesi",
+                trade_registry_no="678901",
+                company_type="A.Ş.",
+                phone="0312 555 0606",
+                email="info@pqrenerji.com",
+                website="www.pqrenerji.com",
+                address="Teknokent, Enerji Bulvarı No:45",
+                city="Ankara",
+                district="Çankaya",
+                contact_person="Serkan Aydın",
+                contact_phone="0537 555 0606",
+                contact_email="serkan.aydin@pqrenerji.com",
+                sector="Enerji",
+                revenue=35000000,
+                assets=25000000,
+                liabilities=10000000,
+                credit_limit=6000000,
+                risk_score=720,
+                risk_level=RiskLevel.LOW,
+                pd_score=2.1,
+                financial_health=FinancialHealth.GOOD,
+                status=CompanyStatus.ACTIVE,
+                last_analysis="2025-01-21"
+            ),
+            Company(
+                name="STU Lojistik Ltd.",
+                tax_id="7890123456",
+                tax_office="İstanbul Vergi Dairesi",
+                trade_registry_no="789012",
+                company_type="Ltd. Şti.",
+                phone="0212 555 0707",
+                email="info@stulojistik.com",
+                address="Hadımköy Organize Sanayi Bölgesi, Lojistik Caddesi No:12",
+                city="İstanbul",
+                district="Arnavutköy",
+                contact_person="Elif Kara",
+                contact_phone="0538 555 0707",
+                contact_email="elif.kara@stulojistik.com",
+                sector="Lojistik",
+                revenue=22000000,
+                assets=18000000,
+                liabilities=12000000,
+                credit_limit=4000000,
+                risk_score=650,
+                risk_level=RiskLevel.MEDIUM,
+                pd_score=6.2,
+                financial_health=FinancialHealth.AVERAGE,
+                status=CompanyStatus.ACTIVE,
+                last_analysis="2025-01-20"
+            ),
+            Company(
+                name="VWX Sağlık Hizmetleri A.Ş.",
+                tax_id="8901234567",
+                tax_office="İzmir Vergi Dairesi",
+                trade_registry_no="890123",
+                company_type="A.Ş.",
+                phone="0232 555 0808",
+                email="info@vwxsaglik.com",
+                website="www.vwxsaglik.com",
+                address="Alsancak Mahallesi, Sağlık Sokak No:34",
+                city="İzmir",
+                district="Konak",
+                contact_person="Dr. Murat Özdemir",
+                contact_phone="0539 555 0808",
+                contact_email="murat.ozdemir@vwxsaglik.com",
+                sector="Sağlık",
+                revenue=15000000,
+                assets=12000000,
+                liabilities=5000000,
+                credit_limit=3000000,
+                risk_score=780,
+                risk_level=RiskLevel.LOW,
+                pd_score=1.5,
+                financial_health=FinancialHealth.GOOD,
+                status=CompanyStatus.ACTIVE,
+                last_analysis="2025-01-19"
+            ),
+            Company(
+                name="YZ Tarım Ürünleri Ltd.",
+                tax_id="9012345678",
+                tax_office="Antalya Vergi Dairesi",
+                trade_registry_no="901234",
+                company_type="Ltd. Şti.",
+                phone="0242 555 0909",
+                email="info@yztarim.com",
+                address="Aksu Organize Sanayi Bölgesi, Tarım Caddesi No:78",
+                city="Antalya",
+                district="Aksu",
+                contact_person="Hasan Çelik",
+                contact_phone="0540 555 0909",
+                contact_email="hasan.celik@yztarim.com",
+                sector="Tarım",
+                revenue=9000000,
+                assets=8000000,
+                liabilities=6000000,
+                credit_limit=1500000,
+                risk_score=580,
+                risk_level=RiskLevel.MEDIUM,
+                pd_score=8.1,
+                financial_health=FinancialHealth.AVERAGE,
+                status=CompanyStatus.MONITORING,
+                last_analysis="2025-01-18"
+            ),
+            Company(
+                name="ABC Perakende Zinciri A.Ş.",
+                tax_id="0123456789",
+                tax_office="Bursa Vergi Dairesi",
+                trade_registry_no="012345",
+                company_type="A.Ş.",
+                phone="0224 555 1010",
+                email="info@abcperakende.com",
+                website="www.abcperakende.com",
+                address="Merkez Mahallesi, Ticaret Bulvarı No:156",
+                city="Bursa",
+                district="Osmangazi",
+                contact_person="Ayşe Yıldız",
+                contact_phone="0541 555 1010",
+                contact_email="ayse.yildiz@abcperakende.com",
+                sector="Perakende",
+                revenue=55000000,
+                assets=40000000,
+                liabilities=25000000,
+                credit_limit=10000000,
+                risk_score=690,
+                risk_level=RiskLevel.MEDIUM,
+                pd_score=4.8,
+                financial_health=FinancialHealth.AVERAGE,
+                status=CompanyStatus.ACTIVE,
+                last_analysis="2025-01-21"
             )
         ]
         

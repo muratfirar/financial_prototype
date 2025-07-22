@@ -92,29 +92,20 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ company, onClose, onSave }) =
     else if (!validateTaxId(formData.tax_id)) {
       errors.tax_id = 'Geçerli bir VKN (10 haneli) veya TCKN (11 haneli) giriniz';
     }
-    if (!formData.tax_office.trim()) errors.tax_office = 'Vergi dairesi zorunludur';
-    if (!formData.company_type.trim()) errors.company_type = 'Firma tipi zorunludur';
-    if (!formData.phone.trim()) errors.phone = 'Telefon numarası zorunludur';
-    else if (!validatePhone(formData.phone)) {
+    
+    // Opsiyonel alanlar için sadece format kontrolü
+    if (formData.phone && !validatePhone(formData.phone)) {
       errors.phone = 'Geçerli bir telefon numarası giriniz (0xxx xxx xx xx)';
     }
-    if (!formData.email.trim()) errors.email = 'E-posta adresi zorunludur';
-    else if (!validateEmail(formData.email)) {
+    if (formData.email && !validateEmail(formData.email)) {
       errors.email = 'Geçerli bir e-posta adresi giriniz';
     }
-    if (!formData.address.trim()) errors.address = 'Adres zorunludur';
-    if (!formData.city.trim()) errors.city = 'İl zorunludur';
-    if (!formData.district.trim()) errors.district = 'İlçe zorunludur';
-    if (!formData.contact_person.trim()) errors.contact_person = 'Yetkili adı zorunludur';
-    if (!formData.contact_phone.trim()) errors.contact_phone = 'Yetkili telefonu zorunludur';
-    else if (!validatePhone(formData.contact_phone)) {
+    if (formData.contact_phone && !validatePhone(formData.contact_phone)) {
       errors.contact_phone = 'Geçerli bir telefon numarası giriniz';
     }
-    if (!formData.contact_email.trim()) errors.contact_email = 'Yetkili e-postası zorunludur';
-    else if (!validateEmail(formData.contact_email)) {
+    if (formData.contact_email && !validateEmail(formData.contact_email)) {
       errors.contact_email = 'Geçerli bir e-posta adresi giriniz';
     }
-    if (!formData.sector.trim()) errors.sector = 'Sektör zorunludur';
 
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
@@ -272,7 +263,7 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ company, onClose, onSave }) =
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Vergi Dairesi *
+                    Vergi Dairesi
                   </label>
                   <input
                     type="text"
@@ -282,7 +273,6 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ company, onClose, onSave }) =
                     className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                       validationErrors.tax_office ? 'border-red-500' : 'border-gray-300'
                     }`}
-                    required
                   />
                   {validationErrors.tax_office && (
                     <p className="text-red-500 text-sm mt-1">{validationErrors.tax_office}</p>
@@ -291,7 +281,7 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ company, onClose, onSave }) =
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Firma Tipi *
+                    Firma Tipi
                   </label>
                   <select
                     name="company_type"
@@ -300,7 +290,6 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ company, onClose, onSave }) =
                     className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                       validationErrors.company_type ? 'border-red-500' : 'border-gray-300'
                     }`}
-                    required
                   >
                     <option value="">Firma tipi seçiniz</option>
                     {companyTypes.map(type => (
@@ -353,7 +342,7 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ company, onClose, onSave }) =
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Sektör *
+                    Sektör
                   </label>
                   <select
                     name="sector"
@@ -362,7 +351,6 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ company, onClose, onSave }) =
                     className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                       validationErrors.sector ? 'border-red-500' : 'border-gray-300'
                     }`}
-                    required
                   >
                     <option value="">Sektör seçiniz</option>
                     {sectors.map(sector => (
@@ -383,7 +371,7 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ company, onClose, onSave }) =
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Telefon Numarası *
+                    Telefon Numarası
                   </label>
                   <input
                     type="tel"
@@ -394,7 +382,6 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ company, onClose, onSave }) =
                       validationErrors.phone ? 'border-red-500' : 'border-gray-300'
                     }`}
                     placeholder="0xxx xxx xx xx"
-                    required
                   />
                   {validationErrors.phone && (
                     <p className="text-red-500 text-sm mt-1">{validationErrors.phone}</p>
@@ -403,7 +390,7 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ company, onClose, onSave }) =
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    E-posta Adresi *
+                    E-posta Adresi
                   </label>
                   <input
                     type="email"
@@ -413,7 +400,6 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ company, onClose, onSave }) =
                     className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                       validationErrors.email ? 'border-red-500' : 'border-gray-300'
                     }`}
-                    required
                   />
                   {validationErrors.email && (
                     <p className="text-red-500 text-sm mt-1">{validationErrors.email}</p>
@@ -436,7 +422,7 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ company, onClose, onSave }) =
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    İl *
+                    İl
                   </label>
                   <select
                     name="city"
@@ -445,7 +431,6 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ company, onClose, onSave }) =
                     className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                       validationErrors.city ? 'border-red-500' : 'border-gray-300'
                     }`}
-                    required
                   >
                     <option value="">İl seçiniz</option>
                     {cities.map(city => (
@@ -459,7 +444,7 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ company, onClose, onSave }) =
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    İlçe *
+                    İlçe
                   </label>
                   <input
                     type="text"
@@ -469,7 +454,6 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ company, onClose, onSave }) =
                     className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                       validationErrors.district ? 'border-red-500' : 'border-gray-300'
                     }`}
-                    required
                   />
                   {validationErrors.district && (
                     <p className="text-red-500 text-sm mt-1">{validationErrors.district}</p>
@@ -479,7 +463,7 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ company, onClose, onSave }) =
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Adres *
+                  Adres
                 </label>
                 <textarea
                   name="address"
@@ -489,7 +473,6 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ company, onClose, onSave }) =
                   className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                     validationErrors.address ? 'border-red-500' : 'border-gray-300'
                   }`}
-                  required
                 />
                 {validationErrors.address && (
                   <p className="text-red-500 text-sm mt-1">{validationErrors.address}</p>
@@ -504,7 +487,7 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ company, onClose, onSave }) =
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Adı Soyadı *
+                    Adı Soyadı
                   </label>
                   <input
                     type="text"
@@ -514,7 +497,6 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ company, onClose, onSave }) =
                     className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                       validationErrors.contact_person ? 'border-red-500' : 'border-gray-300'
                     }`}
-                    required
                   />
                   {validationErrors.contact_person && (
                     <p className="text-red-500 text-sm mt-1">{validationErrors.contact_person}</p>
@@ -523,7 +505,7 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ company, onClose, onSave }) =
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Cep Telefonu *
+                    Cep Telefonu
                   </label>
                   <input
                     type="tel"
@@ -534,7 +516,6 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ company, onClose, onSave }) =
                       validationErrors.contact_phone ? 'border-red-500' : 'border-gray-300'
                     }`}
                     placeholder="0xxx xxx xx xx"
-                    required
                   />
                   {validationErrors.contact_phone && (
                     <p className="text-red-500 text-sm mt-1">{validationErrors.contact_phone}</p>
@@ -543,7 +524,7 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ company, onClose, onSave }) =
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    E-posta *
+                    E-posta
                   </label>
                   <input
                     type="email"
@@ -553,7 +534,6 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ company, onClose, onSave }) =
                     className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                       validationErrors.contact_email ? 'border-red-500' : 'border-gray-300'
                     }`}
-                    required
                   />
                   {validationErrors.contact_email && (
                     <p className="text-red-500 text-sm mt-1">{validationErrors.contact_email}</p>
