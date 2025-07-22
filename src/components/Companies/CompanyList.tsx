@@ -85,7 +85,6 @@ const CompanyList: React.FC<CompanyListProps> = ({ companies, onCompanySelect, o
             <Building2 className="h-6 w-6 text-blue-600" />
             <h2 className="text-xl font-semibold text-gray-900">Firma Yönetimi</h2>
           </div>
-          <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
           <button 
             onClick={handleAddCompany}
             className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
