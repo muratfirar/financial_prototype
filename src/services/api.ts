@@ -73,8 +73,11 @@ export const authAPI = {
     localStorage.removeItem('authToken');
   },
 
-  getCurrentUser: () => {
-    return apiRequest('/api/v1/auth/me');
+  getCurrentUser: async () => {
+    if (!authToken) {
+      throw new Error('No auth token');
+    }
+    return await apiRequest('/api/v1/auth/me');
   }
 };
 

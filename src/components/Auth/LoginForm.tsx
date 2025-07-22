@@ -23,6 +23,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
       const user = await authAPI.getCurrentUser();
       onLoginSuccess(user);
     } catch (err) {
+      console.error('Login error:', err);
       setError('Giriş başarısız. Email ve şifrenizi kontrol edin.');
     } finally {
       setIsLoading(false);

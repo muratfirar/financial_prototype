@@ -17,7 +17,7 @@ import { authToken, companiesAPI, dashboardAPI, healthCheck } from './services/a
 import { Company } from './types';
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(!!authToken);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [dashboardStats, setDashboardStats] = useState<any>({});
@@ -34,6 +34,20 @@ function App() {
       const connected = await healthCheck();
       console.log('Backend connected:', connected);
       setBackendConnected(connected);
+      
+      // Check if user is already authenticated
+      if (connected && authToken) {
+        try {
+          const user = await authAPI.getCurrentUser();
+          setCurrentUser(user);
+          setIsAuthenticated(true);
+        } catch (error) {
+          console.error('Failed to get current user:', error);
+          // Clear invalid token
+          authAPI.logout();
+        }
+      }
+      
       setIsLoading(false);
     };
     checkBackend();
@@ -67,8 +81,11 @@ function App() {
   };
 
   const handleLogout = () => {
+    authAPI.logout();
     setIsAuthenticated(false);
     setCurrentUser(null);
+    setActiveSection('dashboard');
+    setSelectedCompany(null);
     setCompanies([]);
     setDashboardStats({});
     setRiskAlerts([]);
