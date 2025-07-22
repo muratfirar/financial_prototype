@@ -9,6 +9,9 @@ from typing import Optional, List
 from datetime import datetime, timedelta
 import enum
 import os
+import json
+import xml.etree.ElementTree as ET
+from xml.dom import minidom
 
 # Database setup (SQLite for local development)
 SQLALCHEMY_DATABASE_URL = "sqlite:///./financial_risk.db"
@@ -92,6 +95,48 @@ class Company(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     created_by = Column(Integer, default=1)
 
+class EDefterData(Base):
+    __tablename__ = "edefter_data"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    company_id = Column(Integer, index=True)
+    period = Column(String)  # Dönem (2024-01, 2024-02, vb.)
+    file_type = Column(String)  # XML, JSON, CSV
+    file_name = Column(String)
+    file_size = Column(Integer)
+    
+    # Mali Tablo Verileri
+    total_assets = Column(Float, default=0.0)
+    current_assets = Column(Float, default=0.0)
+    fixed_assets = Column(Float, default=0.0)
+    total_liabilities = Column(Float, default=0.0)
+    short_term_liabilities = Column(Float, default=0.0)
+    long_term_liabilities = Column(Float, default=0.0)
+    equity = Column(Float, default=0.0)
+    
+    # Gelir Tablosu Verileri
+    net_sales = Column(Float, default=0.0)
+    gross_profit = Column(Float, default=0.0)
+    operating_profit = Column(Float, default=0.0)
+    net_profit = Column(Float, default=0.0)
+    
+    # Nakit Akış Verileri
+    operating_cash_flow = Column(Float, default=0.0)
+    investing_cash_flow = Column(Float, default=0.0)
+    financing_cash_flow = Column(Float, default=0.0)
+    
+    # Finansal Oranlar
+    current_ratio = Column(Float, default=0.0)
+    debt_to_equity = Column(Float, default=0.0)
+    return_on_assets = Column(Float, default=0.0)
+    return_on_equity = Column(Float, default=0.0)
+    
+    # Meta Veriler
+    upload_date = Column(DateTime, default=datetime.utcnow)
+    processed = Column(Boolean, default=False)
+    validation_status = Column(String, default="pending")  # pending, valid, invalid
+    validation_errors = Column(String)  # JSON format
+    raw_data = Column(String)  # Ham veri (JSON format)
 # Create tables
 def create_tables():
     """Create all tables"""
@@ -172,6 +217,16 @@ class CompanyCreate(BaseModel):
     liabilities: Optional[float] = 0.0
     credit_limit: Optional[float] = 0.0
 
+class EDefterUploadResponse(BaseModel):
+    id: str
+    company_id: str
+    period: str
+    file_name: str
+    file_size: int
+    validation_status: str
+    processed: bool
+    upload_date: str
+    financial_summary: dict
 # FastAPI app
 app = FastAPI(
     title="Financial Risk Management Platform",
@@ -189,6 +244,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# File upload imports
+from fastapi import File, UploadFile
 # OAuth2 scheme
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/auth/login")
 
