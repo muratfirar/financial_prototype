@@ -1,5 +1,7 @@
 // API Service for backend communication
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://financial-risk-api.onrender.com';
+
+console.log('API_BASE_URL:', API_BASE_URL); // Debug log
 
 // Auth token management
 let authToken: string | null = localStorage.getItem('authToken');
@@ -120,9 +122,12 @@ export const dashboardAPI = {
 // Health check
 export const healthCheck = async () => {
   try {
+    console.log('Health check URL:', `${API_BASE_URL}/health`);
     const response = await fetch(`${API_BASE_URL}/health`);
+    console.log('Health check response:', response.status, response.ok);
     return response.ok;
   } catch {
+    console.error('Health check failed');
     return false;
   }
 };

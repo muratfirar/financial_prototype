@@ -30,7 +30,9 @@ function App() {
   // Check backend connection
   useEffect(() => {
     const checkBackend = async () => {
+      console.log('Checking backend connection...');
       const connected = await healthCheck();
+      console.log('Backend connected:', connected);
       setBackendConnected(connected);
       setIsLoading(false);
     };
