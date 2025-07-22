@@ -24,30 +24,5 @@ class Settings(BaseSettings):
     # JWT
     SECRET_KEY: str = os.getenv(
         "SECRET_KEY", 
-        "your-super-secret-key-here-change-in-production"
-    )
-    ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
-    
-    # Application
-    DEBUG: bool = os.getenv("DEBUG", "False").lower() == "true"
-    PROJECT_NAME: str = "Financial Risk Management Platform"
-    VERSION: str = "1.0.0"
-    API_V1_STR: str = "/api/v1"
-    
-    # CORS
-    @property
-    def CORS_ORIGINS(self) -> List[str]:
-        if self.DEBUG:
-            return ["*"]
-        return [
-            "http://localhost:3000",
-            "http://localhost:5173", 
-            "https://financial-risk-frontend.onrender.com"
-        ]
-
-    class Config:
-        env_file = ".env"
-        case_sensitive = True
 
 settings = Settings()
