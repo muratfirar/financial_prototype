@@ -58,7 +58,26 @@ class Company(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
-    tax_id = Column(String, unique=True, index=True)
+    tax_id = Column(String, unique=True, index=True)  # VKN/TCKN
+    tax_office = Column(String)  # Vergi Dairesi
+    trade_registry_no = Column(String)  # Ticaret Sicil No
+    mersis_no = Column(String)  # Mersis No
+    company_type = Column(String)  # A.Ş., Ltd., vb.
+    establishment_date = Column(String)  # Kuruluş Tarihi
+    
+    # İletişim Bilgileri
+    phone = Column(String)
+    email = Column(String)
+    website = Column(String)
+    address = Column(String)
+    city = Column(String)
+    district = Column(String)
+    
+    # Yetkili Bilgileri
+    contact_person = Column(String)
+    contact_phone = Column(String)
+    contact_email = Column(String)
+    
     sector = Column(String)
     revenue = Column(Float, default=0.0)
     assets = Column(Float, default=0.0)
@@ -92,6 +111,20 @@ class CompanyResponse(BaseModel):
     id: str
     name: str
     tax_id: str
+    tax_office: Optional[str] = None
+    trade_registry_no: Optional[str] = None
+    mersis_no: Optional[str] = None
+    company_type: Optional[str] = None
+    establishment_date: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[str] = None
+    website: Optional[str] = None
+    address: Optional[str] = None
+    city: Optional[str] = None
+    district: Optional[str] = None
+    contact_person: Optional[str] = None
+    contact_phone: Optional[str] = None
+    contact_email: Optional[str] = None
     sector: str
     revenue: float
     assets: float
@@ -109,6 +142,20 @@ class CompanyResponse(BaseModel):
 class CompanyCreate(BaseModel):
     name: str
     tax_id: str
+    tax_office: str
+    trade_registry_no: Optional[str] = None
+    mersis_no: Optional[str] = None
+    company_type: str
+    establishment_date: Optional[str] = None
+    phone: str
+    email: str
+    website: Optional[str] = None
+    address: str
+    city: str
+    district: str
+    contact_person: str
+    contact_phone: str
+    contact_email: str
     sector: str
     revenue: Optional[float] = 0.0
     assets: Optional[float] = 0.0
@@ -188,6 +235,18 @@ def init_sample_data():
             Company(
                 name="ABC Teknoloji A.Ş.",
                 tax_id="1234567890",
+                tax_office="Beşiktaş Vergi Dairesi",
+                trade_registry_no="123456",
+                company_type="A.Ş.",
+                phone="0212 555 0101",
+                email="info@abcteknoloji.com",
+                website="www.abcteknoloji.com",
+                address="Levent Mahallesi, Teknoloji Caddesi No:15",
+                city="İstanbul",
+                district="Beşiktaş",
+                contact_person="Ahmet Yılmaz",
+                contact_phone="0532 555 0101",
+                contact_email="ahmet.yilmaz@abcteknoloji.com",
                 sector="Teknoloji",
                 revenue=25000000,
                 assets=15000000,
@@ -195,7 +254,7 @@ def init_sample_data():
                 credit_limit=5000000,
                 risk_score=750,
                 risk_level=RiskLevel.LOW,
-                pd_score=2.3,
+                pd_score=1.8,
                 financial_health=FinancialHealth.GOOD,
                 status=CompanyStatus.ACTIVE,
                 last_analysis="2025-01-19"
@@ -203,6 +262,17 @@ def init_sample_data():
             Company(
                 name="DEF İnşaat Ltd.",
                 tax_id="2345678901",
+                tax_office="Kadıköy Vergi Dairesi",
+                trade_registry_no="234567",
+                company_type="Ltd. Şti.",
+                phone="0216 555 0202",
+                email="info@definsaat.com",
+                address="Fenerbahçe Mahallesi, İnşaat Sokak No:8",
+                city="İstanbul",
+                district="Kadıköy",
+                contact_person="Mehmet Demir",
+                contact_phone="0533 555 0202",
+                contact_email="mehmet.demir@definsaat.com",
                 sector="İnşaat",
                 revenue=12000000,
                 assets=20000000,
@@ -210,7 +280,7 @@ def init_sample_data():
                 credit_limit=2000000,
                 risk_score=520,
                 risk_level=RiskLevel.HIGH,
-                pd_score=8.7,
+                pd_score=12.4,
                 financial_health=FinancialHealth.POOR,
                 status=CompanyStatus.MONITORING,
                 last_analysis="2025-01-18"
@@ -218,6 +288,17 @@ def init_sample_data():
             Company(
                 name="GHI Tekstil San.",
                 tax_id="3456789012",
+                tax_office="Bursa Vergi Dairesi",
+                trade_registry_no="345678",
+                company_type="San. ve Tic. A.Ş.",
+                phone="0224 555 0303",
+                email="info@ghiteksil.com",
+                address="Organize Sanayi Bölgesi, 15. Cadde No:42",
+                city="Bursa",
+                district="Nilüfer",
+                contact_person="Fatma Kaya",
+                contact_phone="0534 555 0303",
+                contact_email="fatma.kaya@ghiteksil.com",
                 sector="Tekstil",
                 revenue=18000000,
                 assets=12000000,
@@ -225,7 +306,7 @@ def init_sample_data():
                 credit_limit=3500000,
                 risk_score=680,
                 risk_level=RiskLevel.MEDIUM,
-                pd_score=4.2,
+                pd_score=5.7,
                 financial_health=FinancialHealth.AVERAGE,
                 status=CompanyStatus.ACTIVE,
                 last_analysis="2025-01-20"
@@ -233,6 +314,18 @@ def init_sample_data():
             Company(
                 name="JKL Gıda A.Ş.",
                 tax_id="4567890123",
+                tax_office="Ankara Vergi Dairesi",
+                trade_registry_no="456789",
+                company_type="A.Ş.",
+                phone="0312 555 0404",
+                email="info@jklgida.com",
+                website="www.jklgida.com",
+                address="Ostim Sanayi Sitesi, Gıda Caddesi No:23",
+                city="Ankara",
+                district="Yenimahalle",
+                contact_person="Ali Özkan",
+                contact_phone="0535 555 0404",
+                contact_email="ali.ozkan@jklgida.com",
                 sector="Gıda",
                 revenue=45000000,
                 assets=30000000,
@@ -240,7 +333,7 @@ def init_sample_data():
                 credit_limit=8000000,
                 risk_score=820,
                 risk_level=RiskLevel.LOW,
-                pd_score=1.8,
+                pd_score=0.9,
                 financial_health=FinancialHealth.EXCELLENT,
                 status=CompanyStatus.ACTIVE,
                 last_analysis="2025-01-19"
@@ -248,6 +341,17 @@ def init_sample_data():
             Company(
                 name="MNO Otomotiv Ltd.",
                 tax_id="5678901234",
+                tax_office="İzmir Vergi Dairesi",
+                trade_registry_no="567890",
+                company_type="Ltd. Şti.",
+                phone="0232 555 0505",
+                email="info@mnootomotiv.com",
+                address="Atatürk Organize Sanayi Bölgesi, Otomotiv Caddesi No:67",
+                city="İzmir",
+                district="Çiğli",
+                contact_person="Zeynep Arslan",
+                contact_phone="0536 555 0505",
+                contact_email="zeynep.arslan@mnootomotiv.com",
                 sector="Otomotiv",
                 revenue=8000000,
                 assets=15000000,
@@ -255,7 +359,7 @@ def init_sample_data():
                 credit_limit=1000000,
                 risk_score=420,
                 risk_level=RiskLevel.CRITICAL,
-                pd_score=15.2,
+                pd_score=18.3,
                 financial_health=FinancialHealth.CRITICAL,
                 status=CompanyStatus.MONITORING,
                 last_analysis="2025-01-20"
@@ -340,6 +444,20 @@ def get_companies(
             id=str(company.id),
             name=company.name,
             tax_id=company.tax_id,
+            tax_office=company.tax_office,
+            trade_registry_no=company.trade_registry_no,
+            mersis_no=company.mersis_no,
+            company_type=company.company_type,
+            establishment_date=company.establishment_date,
+            phone=company.phone,
+            email=company.email,
+            website=company.website,
+            address=company.address,
+            city=company.city,
+            district=company.district,
+            contact_person=company.contact_person,
+            contact_phone=company.contact_phone,
+            contact_email=company.contact_email,
             sector=company.sector,
             revenue=company.revenue,
             assets=company.assets,
@@ -397,6 +515,20 @@ def create_company(
     db_company = Company(
         name=company_data.name,
         tax_id=company_data.tax_id,
+        tax_office=company_data.tax_office,
+        trade_registry_no=company_data.trade_registry_no,
+        mersis_no=company_data.mersis_no,
+        company_type=company_data.company_type,
+        establishment_date=company_data.establishment_date,
+        phone=company_data.phone,
+        email=company_data.email,
+        website=company_data.website,
+        address=company_data.address,
+        city=company_data.city,
+        district=company_data.district,
+        contact_person=company_data.contact_person,
+        contact_phone=company_data.contact_phone,
+        contact_email=company_data.contact_email,
         sector=company_data.sector,
         revenue=company_data.revenue,
         assets=company_data.assets,
@@ -414,6 +546,20 @@ def create_company(
         id=str(db_company.id),
         name=db_company.name,
         tax_id=db_company.tax_id,
+        tax_office=db_company.tax_office,
+        trade_registry_no=db_company.trade_registry_no,
+        mersis_no=db_company.mersis_no,
+        company_type=db_company.company_type,
+        establishment_date=db_company.establishment_date,
+        phone=db_company.phone,
+        email=db_company.email,
+        website=db_company.website,
+        address=db_company.address,
+        city=db_company.city,
+        district=db_company.district,
+        contact_person=db_company.contact_person,
+        contact_phone=db_company.contact_phone,
+        contact_email=db_company.contact_email,
         sector=db_company.sector,
         revenue=db_company.revenue,
         assets=db_company.assets,
