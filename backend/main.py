@@ -809,6 +809,295 @@ def get_dashboard_stats(db: Session = Depends(get_db)):
         "risk_distribution": risk_counts
     }
 
+# e-Defter XML Parser
+def parse_edefter_xml(xml_content: str, company_id: int, file_name: str) -> dict:
+    """Parse e-Defter XML content and extract financial data"""
+    try:
+        root = ET.fromstring(xml_content)
+        
+        # e-Defter XML namespace handling
+        namespaces = {
+            'xbrli': 'http://www.xbrl.org/2003/instance',
+            'iso4217': 'http://www.xbrl.org/2003/iso4217',
+            'link': 'http://www.xbrl.org/2003/linkbase',
+            'xlink': 'http://www.w3.org/1999/xlink',
+            'xsi': 'http://www.w3.org/2001/XMLSchema-instance'
+        }
+        
+        # Extract period information
+        period_elem = root.find('.//xbrli:period', namespaces)
+        period = "2024-12" if period_elem is None else period_elem.text
+        
+        # Extract financial data with Turkish e-Defter structure
+        financial_data = {
+            'period': period,
+            'total_assets': extract_numeric_value(root, 'ToplamVarliklar', namespaces),
+            'current_assets': extract_numeric_value(root, 'DonVarliklar', namespaces),
+            'fixed_assets': extract_numeric_value(root, 'DuranVarliklar', namespaces),
+            'total_liabilities': extract_numeric_value(root, 'ToplamYukumlulukler', namespaces),
+            'short_term_liabilities': extract_numeric_value(root, 'KisaVadeliYukumlulukler', namespaces),
+            'long_term_liabilities': extract_numeric_value(root, 'UzunVadeliYukumlulukler', namespaces),
+            'equity': extract_numeric_value(root, 'Ozkaynaklar', namespaces),
+            'net_sales': extract_numeric_value(root, 'NetSatislar', namespaces),
+            'gross_profit': extract_numeric_value(root, 'BrutKar', namespaces),
+            'operating_profit': extract_numeric_value(root, 'FaaliyetKari', namespaces),
+            'net_profit': extract_numeric_value(root, 'NetKar', namespaces),
+            'operating_cash_flow': extract_numeric_value(root, 'FaaliyetNakitAkisi', namespaces),
+            'investing_cash_flow': extract_numeric_value(root, 'YatirimNakitAkisi', namespaces),
+            'financing_cash_flow': extract_numeric_value(root, 'FinansmanNakitAkisi', namespaces)
+        }
+        
+        # Calculate financial ratios
+        if financial_data['total_assets'] > 0:
+            financial_data['return_on_assets'] = (financial_data['net_profit'] / financial_data['total_assets']) * 100
+        
+        if financial_data['equity'] > 0:
+            financial_data['return_on_equity'] = (financial_data['net_profit'] / financial_data['equity']) * 100
+            financial_data['debt_to_equity'] = financial_data['total_liabilities'] / financial_data['equity']
+        
+        if financial_data['short_term_liabilities'] > 0:
+            financial_data['current_ratio'] = financial_data['current_assets'] / financial_data['short_term_liabilities']
+        
+        return financial_data
+        
+    except Exception as e:
+        raise ValueError(f"XML parsing error: {str(e)}")
+
+def extract_numeric_value(root, element_name: str, namespaces: dict) -> float:
+    """Extract numeric value from XML element"""
+    try:
+        # Try different possible element paths
+        element = root.find(f'.//{element_name}', namespaces)
+        if element is None:
+            element = root.find(f'.//xbrli:{element_name}', namespaces)
+        
+        if element is not None and element.text:
+            # Clean and convert to float
+            value = element.text.replace(',', '').replace('.', '')
+            return float(value) / 100 if value.isdigit() else 0.0
+        return 0.0
+    except:
+        return 0.0
+
+def create_sample_edefter_xml(company_name: str, tax_id: str, period: str) -> str:
+    """Create sample e-Defter XML data"""
+    xml_template = f"""<?xml version="1.0" encoding="UTF-8"?>
+<xbrli:xbrl xmlns:xbrli="http://www.xbrl.org/2003/instance"
+            xmlns:iso4217="http://www.xbrl.org/2003/iso4217"
+            xmlns:link="http://www.xbrl.org/2003/linkbase"
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    
+    <!-- Şirket Bilgileri -->
+    <SirketUnvani>{company_name}</SirketUnvani>
+    <VergiNumarasi>{tax_id}</VergiNumarasi>
+    <Donem>{period}</Donem>
+    
+    <!-- Bilanço Verileri -->
+    <ToplamVarliklar>2500000000</ToplamVarliklar>
+    <DonVarliklar>1500000000</DonVarliklar>
+    <DuranVarliklar>1000000000</DuranVarliklar>
+    
+    <ToplamYukumlulukler>1800000000</ToplamYukumlulukler>
+    <KisaVadeliYukumlulukler>800000000</KisaVadeliYukumlulukler>
+    <UzunVadeliYukumlulukler>1000000000</UzunVadeliYukumlulukler>
+    
+    <Ozkaynaklar>700000000</Ozkaynaklar>
+    
+    <!-- Gelir Tablosu Verileri -->
+    <NetSatislar>3500000000</NetSatislar>
+    <BrutKar>1200000000</BrutKar>
+    <FaaliyetKari>450000000</FaaliyetKari>
+    <NetKar>320000000</NetKar>
+    
+    <!-- Nakit Akış Verileri -->
+    <FaaliyetNakitAkisi>400000000</FaaliyetNakitAkisi>
+    <YatirimNakitAkisi>-150000000</YatirimNakitAkisi>
+    <FinansmanNakitAkisi>-200000000</FinansmanNakitAkisi>
+    
+</xbrli:xbrl>"""
+    return xml_template
+
+@app.post("/api/v1/edefter/upload", response_model=EDefterUploadResponse)
+async def upload_edefter_file(
+    company_id: int,
+    period: str,
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: UserResponse = Depends(get_current_user)
+):
+    """Upload and process e-Defter file"""
+    
+    # Validate company exists
+    company = db.query(Company).filter(Company.id == company_id).first()
+    if not company:
+        raise HTTPException(status_code=404, detail="Company not found")
+    
+    # Read file content
+    content = await file.read()
+    file_content = content.decode('utf-8')
+    
+    try:
+        # Parse e-Defter data
+        financial_data = parse_edefter_xml(file_content, company_id, file.filename)
+        
+        # Create e-Defter record
+        edefter_record = EDefterData(
+            company_id=company_id,
+            period=period,
+            file_type=file.filename.split('.')[-1].upper(),
+            file_name=file.filename,
+            file_size=len(content),
+            **financial_data,
+            raw_data=json.dumps(financial_data),
+            processed=True,
+            validation_status="valid"
+        )
+        
+        db.add(edefter_record)
+        
+        # Update company financial data
+        company.revenue = financial_data.get('net_sales', 0)
+        company.assets = financial_data.get('total_assets', 0)
+        company.liabilities = financial_data.get('total_liabilities', 0)
+        
+        # Recalculate risk scores based on new data
+        if financial_data.get('total_assets', 0) > 0:
+            debt_ratio = financial_data.get('total_liabilities', 0) / financial_data.get('total_assets', 0)
+            if debt_ratio < 0.3:
+                company.risk_level = RiskLevel.LOW
+                company.risk_score = 750 + int((1 - debt_ratio) * 200)
+            elif debt_ratio < 0.6:
+                company.risk_level = RiskLevel.MEDIUM
+                company.risk_score = 500 + int((0.6 - debt_ratio) * 500)
+            elif debt_ratio < 0.8:
+                company.risk_level = RiskLevel.HIGH
+                company.risk_score = 300 + int((0.8 - debt_ratio) * 400)
+            else:
+                company.risk_level = RiskLevel.CRITICAL
+                company.risk_score = 200 + int((1 - debt_ratio) * 200)
+        
+        company.last_analysis = datetime.now().strftime("%Y-%m-%d")
+        
+        db.commit()
+        db.refresh(edefter_record)
+        
+        return EDefterUploadResponse(
+            id=str(edefter_record.id),
+            company_id=str(company_id),
+            period=period,
+            file_name=file.filename,
+            file_size=len(content),
+            validation_status="valid",
+            processed=True,
+            upload_date=edefter_record.upload_date.isoformat(),
+            financial_summary={
+                "total_assets": financial_data.get('total_assets', 0),
+                "total_liabilities": financial_data.get('total_liabilities', 0),
+                "equity": financial_data.get('equity', 0),
+                "net_sales": financial_data.get('net_sales', 0),
+                "net_profit": financial_data.get('net_profit', 0),
+                "current_ratio": financial_data.get('current_ratio', 0),
+                "debt_to_equity": financial_data.get('debt_to_equity', 0)
+            }
+        )
+        
+    except Exception as e:
+        # Create failed record
+        edefter_record = EDefterData(
+            company_id=company_id,
+            period=period,
+            file_type=file.filename.split('.')[-1].upper(),
+            file_name=file.filename,
+            file_size=len(content),
+            raw_data=file_content,
+            processed=False,
+            validation_status="invalid",
+            validation_errors=json.dumps({"error": str(e)})
+        )
+        
+        db.add(edefter_record)
+        db.commit()
+        
+        raise HTTPException(status_code=400, detail=f"File processing failed: {str(e)}")
+
+@app.get("/api/v1/edefter/sample/{company_id}")
+def generate_sample_edefter(
+    company_id: int,
+    period: str = "2024-12",
+    db: Session = Depends(get_db),
+    current_user: UserResponse = Depends(get_current_user)
+):
+    """Generate sample e-Defter XML for testing"""
+    
+    company = db.query(Company).filter(Company.id == company_id).first()
+    if not company:
+        raise HTTPException(status_code=404, detail="Company not found")
+    
+    sample_xml = create_sample_edefter_xml(company.name, company.tax_id, period)
+    
+    return {
+        "company_name": company.name,
+        "tax_id": company.tax_id,
+        "period": period,
+        "xml_content": sample_xml,
+        "download_url": f"/api/v1/edefter/download-sample/{company_id}?period={period}"
+    }
+
+@app.get("/api/v1/edefter/download-sample/{company_id}")
+def download_sample_edefter(
+    company_id: int,
+    period: str = "2024-12",
+    db: Session = Depends(get_db)
+):
+    """Download sample e-Defter XML file"""
+    from fastapi.responses import Response
+    
+    company = db.query(Company).filter(Company.id == company_id).first()
+    if not company:
+        raise HTTPException(status_code=404, detail="Company not found")
+    
+    sample_xml = create_sample_edefter_xml(company.name, company.tax_id, period)
+    
+    return Response(
+        content=sample_xml,
+        media_type="application/xml",
+        headers={
+            "Content-Disposition": f"attachment; filename=edefter_{company.tax_id}_{period}.xml"
+        }
+    )
+
+@app.get("/api/v1/edefter/history/{company_id}")
+def get_edefter_history(
+    company_id: int,
+    db: Session = Depends(get_db),
+    current_user: UserResponse = Depends(get_current_user)
+):
+    """Get e-Defter upload history for a company"""
+    
+    records = db.query(EDefterData).filter(EDefterData.company_id == company_id).order_by(EDefterData.upload_date.desc()).all()
+    
+    return [
+        {
+            "id": record.id,
+            "period": record.period,
+            "file_name": record.file_name,
+            "file_type": record.file_type,
+            "file_size": record.file_size,
+            "validation_status": record.validation_status,
+            "processed": record.processed,
+            "upload_date": record.upload_date.isoformat(),
+            "financial_summary": {
+                "total_assets": record.total_assets,
+                "total_liabilities": record.total_liabilities,
+                "equity": record.equity,
+                "net_sales": record.net_sales,
+                "net_profit": record.net_profit
+            }
+        }
+        for record in records
+    ]
+
 # Initialize sample data on startup
 @app.on_event("startup")
 def startup_event():

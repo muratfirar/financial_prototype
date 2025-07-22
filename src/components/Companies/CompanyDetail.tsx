@@ -213,6 +213,18 @@ const CompanyDetail: React.FC<CompanyDetailProps> = ({ company, onBack }) => {
           </div>
         </div>
       </div>
+      
+      {showEDefterUpload && (
+        <EDefterUpload
+          company={company}
+          onClose={() => setShowEDefterUpload(false)}
+          onUploadSuccess={() => {
+            setShowEDefterUpload(false);
+            // Refresh company data
+            window.location.reload();
+          }}
+        />
+      )}
     </div>
   );
 };
