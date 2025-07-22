@@ -76,6 +76,13 @@ lsof -i :8000  # Linux/Mac
 python -c "import uvicorn; uvicorn.run('main:app', host='0.0.0.0', port=8001, reload=True)"
 ```
 
+### Database Sıfırlama:
+```bash
+# Backend dizininde
+python reset_db.py
+python start_local.py  # Yeniden oluşturulur
+```
+
 ## ✅ Başarılı Kurulum Kontrolü
 1. Backend: http://localhost:8000/health → `{"status": "healthy"}`
 2. Frontend: http://localhost:5173 → Login ekranı görünmeli
