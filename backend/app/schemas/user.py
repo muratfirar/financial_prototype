@@ -1,10 +1,10 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
 from app.models.user import UserRole
 
 class UserBase(BaseModel):
-    email: EmailStr
+    email: str
     name: str
     role: UserRole
     avatar: Optional[str] = None
@@ -44,5 +44,5 @@ class TokenData(BaseModel):
     email: Optional[str] = None
 
 class UserLogin(BaseModel):
-    email: EmailStr
+    email: str
     password: str

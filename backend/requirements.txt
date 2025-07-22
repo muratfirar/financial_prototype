@@ -18,6 +18,7 @@ passlib[bcrypt]==1.7.4
 # Utilities
 python-multipart==0.0.6
 python-dotenv==1.0.0
+email-validator==2.1.0
 
 # For health checks in Docker
 requests==2.31.0
