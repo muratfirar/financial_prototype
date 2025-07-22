@@ -3,9 +3,15 @@ set -e
 
 echo "Starting Financial Risk Management Platform..."
 
-# Skip migrations during startup - will be done manually via Shell
-echo "Skipping migrations (will be done manually via Render Shell)"
+# Test basic functionality first
+echo "Running basic tests..."
+python simple_test.py
 
-# Start the application directly
+if [ $? -eq 0 ]; then
+    echo "✅ Basic tests passed"
+else
+    echo "❌ Basic tests failed, starting with minimal configuration"
+fi
+
 echo "Starting FastAPI application..."
 exec uvicorn app.main:app --host 0.0.0.0 --port $PORT

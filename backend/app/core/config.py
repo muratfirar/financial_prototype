@@ -1,6 +1,7 @@
 from pydantic_settings import BaseSettings
 from typing import List
 import os
+import re
 
 class Settings(BaseSettings):
     # Project Info
@@ -23,7 +24,6 @@ class Settings(BaseSettings):
             # Replace external hostname with internal
             # External: dpg-xxx-a
             # Internal: dpg-xxx-a.oregon-postgres.render.com
-            import re
             db_url = re.sub(r'@(dpg-[^/]+)/', r'@\1.oregon-postgres.render.com/', db_url)
         
         # Handle postgres:// vs postgresql:// URL schemes

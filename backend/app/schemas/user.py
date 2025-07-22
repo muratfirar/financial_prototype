@@ -13,7 +13,7 @@ class UserCreate(UserBase):
     password: str
 
 class UserUpdate(BaseModel):
-    email: Optional[EmailStr] = None
+    email: Optional[str] = None
     name: Optional[str] = None
     role: Optional[UserRole] = None
     avatar: Optional[str] = None

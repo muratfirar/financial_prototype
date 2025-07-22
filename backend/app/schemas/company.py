@@ -1,7 +1,11 @@
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
-from app.models.company import RiskLevel, FinancialHealth, CompanyStatus
+
+# Import enums as strings to avoid circular imports
+RiskLevel = str
+FinancialHealth = str  
+CompanyStatus = str
 
 class CompanyBase(BaseModel):
     name: str
