@@ -1,6 +1,10 @@
 // API Service for backend communication
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://financial-prototype-docker.onrender.com';
 
+// Debug log to see what URL is being used
+console.log('API_BASE_URL:', API_BASE_URL);
+console.log('VITE_API_URL env var:', import.meta.env.VITE_API_URL);
+
 
 // Auth token management
 let authToken: string | null = localStorage.getItem('authToken');
