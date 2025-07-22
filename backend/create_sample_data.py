@@ -3,6 +3,7 @@ Script to create sample data for development and testing
 """
 import sys
 import os
+import time
 sys.path.append(os.path.dirname(__file__))
 
 from sqlalchemy.orm import Session
@@ -14,6 +15,21 @@ import random
 
 def create_sample_data():
     """Create sample data for development"""
+    # Wait for database to be ready
+    max_retries = 5
+    for i in range(max_retries):
+        try:
+            db = SessionLocal()
+            db.execute("SELECT 1")
+            db.close()
+            break
+        except Exception as e:
+            if i == max_retries - 1:
+                print(f"Database connection failed after {max_retries} retries: {e}")
+                return
+            print(f"Database not ready, waiting... (attempt {i+1}/{max_retries})")
+            time.sleep(5)
+    
     db = SessionLocal()
     
     try:

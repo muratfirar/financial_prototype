@@ -34,14 +34,26 @@ git push -u origin main
 3. Ayarlar:
    - Name: `financial-risk-api`
    - Environment: Python 3
-   - Build Command: `cd backend && pip install -r requirements.txt && alembic upgrade head`
-   - Start Command: `cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+   - Root Directory: `backend`
+   - Build Command: `pip install --upgrade pip && pip install -r requirements.txt`
+   - Start Command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
    - Plan: Free
 
 4. Environment Variables:
    - `DATABASE_URL`: PostgreSQL connection string (otomatik)
    - `SECRET_KEY`: Generate edilecek
+   - `DEBUG`: `False`
    - `CORS_ORIGINS`: `["https://FRONTEND_URL.onrender.com"]`
+
+### 4.1. Post-Deploy Commands (Backend)
+Backend deploy edildikten sonra:
+1. Render Dashboard'da backend servisinize gidin
+2. "Shell" sekmesine tıklayın
+3. Şu komutları çalıştırın:
+```bash
+alembic upgrade head
+python create_sample_data.py
+```
 
 ### 5. Frontend Kurulumu
 1. "New +" → "Static Site" seçin

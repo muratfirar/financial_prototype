@@ -1,6 +1,7 @@
 from pydantic_settings import BaseSettings
 from typing import List
 import os
+import json
 
 class Settings(BaseSettings):
     # Database
@@ -18,7 +19,16 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     
     # CORS
-    CORS_ORIGINS: List[str] = os.getenv("CORS_ORIGINS", '["http://localhost:3000", "http://localhost:5173"]')
+    _cors_origins: str = os.getenv("CORS_ORIGINS", '["http://localhost:3000", "http://localhost:5173"]')
+    
+    @property
+    def CORS_ORIGINS(self) -> List[str]:
+        if isinstance(self._cors_origins, str):
+            try:
+                return json.loads(self._cors_origins)
+            except json.JSONDecodeError:
+                return [self._cors_origins]
+        return self._cors_origins
 
     class Config:
         env_file = ".env"
