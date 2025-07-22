@@ -27,6 +27,9 @@ RUN pip install --no-cache-dir --upgrade pip \
 # Copy project
 COPY . .
 
+# Make scripts executable
+RUN chmod +x start.sh
+
 # Create non-root user
 RUN adduser --disabled-password --gecos '' appuser \
     && chown -R appuser:appuser /app
@@ -40,4 +43,4 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:$PORT/health || exit 1
 
 # Run the application
-CMD alembic upgrade head && python create_sample_data.py && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+CMD ["./start.sh"]
