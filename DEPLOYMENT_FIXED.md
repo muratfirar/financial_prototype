@@ -39,7 +39,7 @@ git push origin main
    SECRET_KEY: your-generated-secret-key-here
    DEBUG: False
    ```
-sadasdsadasd 
+
 #### C. Backend Deploy Sonrası
 Backend çalıştıktan sonra Shell'den:
 ```bash
