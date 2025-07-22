@@ -1,5 +1,5 @@
 // API Configuration
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://financial-risk-api.onrender.com';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://financial-prototype-docker.onrender.com';
 
 export const API_ENDPOINTS = {
   AUTH: {
