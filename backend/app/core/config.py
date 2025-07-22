@@ -11,19 +11,13 @@ class Settings(BaseSettings):
             os.getenv("DATABASE_URL") or 
             os.getenv("POSTGRES_URL") or 
             os.getenv("DB_URL") or
-           os.getenv("INTERNAL_DATABASE_URL") or
+            os.getenv("INTERNAL_DATABASE_URL") or
             "postgresql://financial_user:financial_password@localhost:5432/financial_risk_db"
         )
         
         # Handle postgres:// vs postgresql:// URL schemes
         if db_url.startswith("postgres://"):
             db_url = db_url.replace("postgres://", "postgresql://", 1)
-       
-       # For Render.com, try to use internal hostname if external fails
-       if "dpg-" in db_url and "-a/" in db_url:
-           # Convert external hostname to internal
-           # dpg-xxx-a -> dpg-xxx-a.oregon-postgres.render.com
-           db_url = db_url.replace("-a/", "-a.oregon-postgres.render.com/")
             
         return db_url
     

@@ -7,8 +7,8 @@ from app.core.config import settings
 
 def create_database_engine():
     """Create database engine with retry logic"""
-    max_retries = 5
-    retry_delay = 2
+    max_retries = 10
+    retry_delay = 5
     
     for attempt in range(max_retries):
         try:
@@ -17,20 +17,19 @@ def create_database_engine():
                 print(f"Attempt {attempt + 1}: DATABASE_URL is empty, waiting...")
                 time.sleep(retry_delay)
                 continue
-           
-           print(f"Attempt {attempt + 1}: Trying to connect to database...")
-           print(f"Database URL host: {database_url.split('@')[1].split('/')[0] if '@' in database_url else 'unknown'}")
                 
+            print(f"Attempt {attempt + 1}: Trying to connect to database...")
+            
             engine = create_engine(
                 database_url,
                 pool_pre_ping=True,
                 echo=settings.DEBUG,
                 pool_recycle=300,
-               pool_timeout=30,
-               connect_args={
-                   "connect_timeout": 30,
-                   "application_name": "financial_risk_platform"
-               }
+                pool_timeout=60,
+                connect_args={
+                    "connect_timeout": 60,
+                    "application_name": "financial_risk_platform"
+                }
             )
             
             # Test connection
@@ -44,8 +43,14 @@ def create_database_engine():
             print(f"Database connection attempt {attempt + 1} failed: {e}")
             if attempt == max_retries - 1:
                 print("All database connection attempts failed")
-               print(f"Final DATABASE_URL: {settings.DATABASE_URL}")
-                raise
+                print(f"Final DATABASE_URL: {settings.DATABASE_URL}")
+                # Don't raise exception, let the app start and retry later
+                print("Creating engine anyway, connections will be retried at runtime...")
+                return create_engine(
+                    database_url if database_url else "sqlite:///./fallback.db",
+                    pool_pre_ping=True,
+                    echo=settings.DEBUG
+                )
             time.sleep(retry_delay)
     
     raise Exception("Could not establish database connection")
