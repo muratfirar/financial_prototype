@@ -753,12 +753,10 @@ def get_dashboard_stats(db: Session = Depends(get_db)):
     }
 
 # Initialize sample data on startup
+@app.on_event("startup")
 def startup_event():
     create_tables()  # Ensure tables exist
     init_sample_data()
-
-# Call startup event
-startup_event()
 
 if __name__ == "__main__":
     import uvicorn
