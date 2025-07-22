@@ -93,7 +93,17 @@ class Company(Base):
     created_by = Column(Integer, default=1)
 
 # Create tables
-Base.metadata.create_all(bind=engine)
+def create_tables():
+    """Create all tables"""
+    try:
+        Base.metadata.drop_all(bind=engine)  # Drop existing tables
+        Base.metadata.create_all(bind=engine)  # Create new tables
+        print("✅ Database tables created successfully")
+    except Exception as e:
+        print(f"❌ Error creating tables: {e}")
+
+# Create tables on startup
+create_tables()
 
 # Pydantic Models
 class Token(BaseModel):
@@ -744,6 +754,7 @@ def get_dashboard_stats(db: Session = Depends(get_db)):
 
 # Initialize sample data on startup
 def startup_event():
+    create_tables()  # Ensure tables exist
     init_sample_data()
 
 # Call startup event
