@@ -1,6 +1,41 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import os
+from fastapi.security import OAuth2PasswordRequestForm
+from pydantic import BaseModel
+from typing import Optional
+
+# Mock user data for testing
+MOCK_USERS = {
+    "admin@finansal.com": {
+        "id": "1",
+        "name": "Sistem Yöneticisi",
+        "email": "admin@finansal.com",
+        "role": "admin",
+        "password": "admin123",
+        "avatar": None
+    },
+    "analyst@finansal.com": {
+        "id": "2", 
+        "name": "Risk Analisti",
+        "email": "analyst@finansal.com",
+        "role": "risk-analyst",
+        "password": "analyst123",
+        "avatar": None
+    }
+}
+
+# Pydantic models
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class User(BaseModel):
+    id: str
+    name: str
+    email: str
+    role: str
+    avatar: Optional[str] = None
 
 # Create FastAPI app
 app = FastAPI(
@@ -43,6 +78,41 @@ def test_route():
         "message": "API is working",
         "status": "success"
     }
+
+# Authentication endpoints
+@app.post("/api/v1/auth/login", response_model=Token)
+def login(form_data: OAuth2PasswordRequestForm = None):
+    """Login endpoint that accepts form data"""
+    if not form_data:
+        return {"detail": "Form data required"}, 400
+    
+    email = form_data.username
+    password = form_data.password
+    
+    # Check if user exists and password matches
+    if email in MOCK_USERS and MOCK_USERS[email]["password"] == password:
+        # Generate a simple token (in production, use proper JWT)
+        token = f"mock_token_{email}_{password}"
+        return {
+            "access_token": token,
+            "token_type": "bearer"
+        }
+    
+    from fastapi import HTTPException
+    raise HTTPException(status_code=401, detail="Incorrect email or password")
+
+@app.get("/api/v1/auth/me", response_model=User)
+def get_current_user():
+    """Get current user info (mock implementation)"""
+    # In a real implementation, you would verify the token
+    # For now, return admin user
+    return User(**{
+        "id": "1",
+        "name": "Sistem Yöneticisi", 
+        "email": "admin@finansal.com",
+        "role": "admin",
+        "avatar": None
+    })
 
 # Dashboard stats (mock data for now)
 @app.get("/api/v1/dashboard/stats")
