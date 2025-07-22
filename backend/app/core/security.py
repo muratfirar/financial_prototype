@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from typing import Any, Union
-from jose import jwt
+import jwt
 from passlib.context import CryptContext
 from app.core.config import settings
 
@@ -31,5 +31,5 @@ def verify_token(token: str) -> Union[str, None]:
             token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
         )
         return payload.get("sub")
-    except jwt.JWTError:
+    except jwt.InvalidTokenError:
         return None

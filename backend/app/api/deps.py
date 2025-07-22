@@ -48,7 +48,7 @@ def get_current_active_user(
     """
     return current_user
 
-def require_role(required_roles: list[UserRole]):
+def require_role(required_roles: list):
     """
     Dependency factory for role-based access control
     """
