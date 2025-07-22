@@ -1,13 +1,15 @@
 import React from 'react';
 import { Bell, Search, User, LogOut } from 'lucide-react';
 import { User as UserType } from '../../types';
+import { authAPI } from '../../services/api';
 
 interface HeaderProps {
   user: UserType;
   unreadAlerts: number;
+  onLogout: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ user, unreadAlerts }) => {
+const Header: React.FC<HeaderProps> = ({ user, unreadAlerts, onLogout }) => {
   const getRoleLabel = (role: string) => {
     const roles = {
       'admin': 'Sistem Yöneticisi',
@@ -19,6 +21,10 @@ const Header: React.FC<HeaderProps> = ({ user, unreadAlerts }) => {
     return roles[role as keyof typeof roles] || role;
   };
 
+  const handleLogout = () => {
+    authAPI.logout();
+    onLogout();
+  };
   return (
     <div className="bg-white shadow-sm border-b border-gray-200 h-16 fixed top-0 right-0 left-64 z-20">
       <div className="flex items-center justify-between h-full px-6">
@@ -62,7 +68,11 @@ const Header: React.FC<HeaderProps> = ({ user, unreadAlerts }) => {
               </div>
             </div>
             
-            <button className="p-2 text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100">
+            <button 
+              onClick={handleLogout}
+              className="p-2 text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100"
+              title="Çıkış Yap"
+            >
               <LogOut className="h-5 w-5" />
             </button>
           </div>

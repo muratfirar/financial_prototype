@@ -10,18 +10,30 @@ export interface User {
 export interface Company {
   id: string;
   name: string;
-  taxId: string;
+  tax_id: string;
   sector: string;
-  riskScore: number;
-  riskLevel: 'low' | 'medium' | 'high' | 'critical';
-  creditLimit: number;
-  lastAnalysis: string;
-  pdScore: number; // Probability of Default
-  financialHealth: 'excellent' | 'good' | 'average' | 'poor' | 'critical';
+  risk_score: number;
+  risk_level: 'low' | 'medium' | 'high' | 'critical';
+  credit_limit: number;
+  last_analysis: string;
+  pd_score: number; // Probability of Default
+  financial_health: 'excellent' | 'good' | 'average' | 'poor' | 'critical';
   revenue: number;
   assets: number;
   liabilities: number;
   status: 'active' | 'inactive' | 'monitoring';
+  created_at: string;
+  updated_at?: string;
+  created_by: number;
+  
+  // Computed properties for backward compatibility
+  get taxId(): string { return this.tax_id; }
+  get riskScore(): number { return this.risk_score; }
+  get riskLevel(): 'low' | 'medium' | 'high' | 'critical' { return this.risk_level; }
+  get creditLimit(): number { return this.credit_limit; }
+  get lastAnalysis(): string { return this.last_analysis; }
+  get pdScore(): number { return this.pd_score; }
+  get financialHealth(): 'excellent' | 'good' | 'average' | 'poor' | 'critical' { return this.financial_health; }
 }
 
 export interface RiskAlert {

@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Building2, BarChart3, Shield, AlertTriangle, TrendingUp, FileText, Users } from 'lucide-react';
 
 // Components
 import Sidebar from './components/Layout/Sidebar';
 import Header from './components/Layout/Header';
+import LoginForm from './components/Auth/LoginForm';
 import StatsCard from './components/Dashboard/StatsCard';
 import RiskDistributionChart from './components/Dashboard/RiskDistributionChart';
 import RecentAlerts from './components/Dashboard/RecentAlerts';
@@ -11,13 +12,107 @@ import CompanyList from './components/Companies/CompanyList';
 import CompanyDetail from './components/Companies/CompanyDetail';
 import RiskAnalysis from './components/RiskAnalysis/RiskAnalysis';
 
-// Data
-import { currentUser, companies, riskAlerts, dashboardStats } from './data/mockData';
+// Services
+import { authToken, companiesAPI, dashboardAPI, healthCheck } from './services/api';
 import { Company } from './types';
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(!!authToken);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [companies, setCompanies] = useState<Company[]>([]);
+  const [dashboardStats, setDashboardStats] = useState<any>({});
+  const [riskAlerts, setRiskAlerts] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [backendConnected, setBackendConnected] = useState(false);
   const [activeSection, setActiveSection] = useState('dashboard');
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
+
+  // Check backend connection
+  useEffect(() => {
+    const checkBackend = async () => {
+      const connected = await healthCheck();
+      setBackendConnected(connected);
+      setIsLoading(false);
+    };
+    checkBackend();
+  }, []);
+
+  // Load data when authenticated
+  useEffect(() => {
+    if (isAuthenticated && backendConnected) {
+      loadData();
+    }
+  }, [isAuthenticated, backendConnected]);
+
+  const loadData = async () => {
+    try {
+      const [companiesData, statsData] = await Promise.all([
+        companiesAPI.getAll(),
+        dashboardAPI.getStats()
+      ]);
+      
+      setCompanies(companiesData || []);
+      setDashboardStats(statsData || {});
+      setRiskAlerts([]); // Will be loaded from alerts API later
+    } catch (error) {
+      console.error('Failed to load data:', error);
+    }
+  };
+
+  const handleLoginSuccess = (user: any) => {
+    setCurrentUser(user);
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setCurrentUser(null);
+    setCompanies([]);
+    setDashboardStats({});
+    setRiskAlerts([]);
+  };
+
+  const handleCompanyUpdate = () => {
+    loadData(); // Reload companies after update
+  };
+
+  // Show loading screen
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Sistem kontrol ediliyor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show backend connection error
+  if (!backendConnected) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center bg-white p-8 rounded-xl shadow-sm border border-gray-200">
+          <AlertTriangle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Backend Bağlantısı Kurulamadı</h2>
+          <p className="text-gray-600 mb-4">
+            Backend servisi çalışmıyor veya erişilemiyor.
+          </p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            Tekrar Dene
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Show login form if not authenticated
+  if (!isAuthenticated) {
+    return <LoginForm onLoginSuccess={handleLoginSuccess} />;
+  }
 
   const unreadAlerts = riskAlerts.filter(alert => !alert.isRead).length;
 
@@ -48,28 +143,28 @@ function App() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <StatsCard
                 title="Toplam Firma"
-                value={dashboardStats.totalCompanies}
+                value={dashboardStats.total_companies || 0}
                 icon={Building2}
                 color="blue"
                 trend={{ value: 12, isPositive: true }}
               />
               <StatsCard
                 title="Aktif Analiz"
-                value={dashboardStats.activeAnalyses}
+                value={dashboardStats.total_analyses || 0}
                 icon={BarChart3}
                 color="green"
                 trend={{ value: 8, isPositive: true }}
               />
               <StatsCard
                 title="Kritik Uyarı"
-                value={dashboardStats.criticalAlerts}
+                value={dashboardStats.critical_alerts || 0}
                 icon={AlertTriangle}
                 color="red"
                 trend={{ value: -15, isPositive: false }}
               />
               <StatsCard
                 title="Ortalama Risk Skoru"
-                value={dashboardStats.averageRiskScore}
+                value={dashboardStats.average_risk_score || 0}
                 icon={Shield}
                 color="yellow"
                 trend={{ value: 3, isPositive: true }}
@@ -126,6 +221,7 @@ function App() {
           <CompanyList 
             companies={companies} 
             onCompanySelect={setSelectedCompany}
+            onCompanyUpdate={handleCompanyUpdate}
           />
         );
         
@@ -196,10 +292,14 @@ function App() {
       <Sidebar 
         activeSection={activeSection} 
         onSectionChange={setActiveSection}
-        userRole={currentUser.role}
+        userRole={currentUser?.role || 'data-observer'}
       />
       
-      <Header user={currentUser} unreadAlerts={unreadAlerts} />
+      <Header 
+        user={currentUser || { name: 'Kullanıcı', email: '', role: 'data-observer' }} 
+        unreadAlerts={unreadAlerts}
+        onLogout={handleLogout}
+      />
       
       <main className="ml-64 pt-16 p-6">
         {renderContent()}

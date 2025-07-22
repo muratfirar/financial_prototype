@@ -1,15 +1,19 @@
 import React, { useState } from 'react';
 import { Building2, Search, Filter, Plus, Eye, Edit, AlertTriangle } from 'lucide-react';
 import { Company } from '../../types';
+import CompanyForm from './CompanyForm';
 
 interface CompanyListProps {
   companies: Company[];
   onCompanySelect: (company: Company) => void;
+  onCompanyUpdate: () => void;
 }
 
-const CompanyList: React.FC<CompanyListProps> = ({ companies, onCompanySelect }) => {
+const CompanyList: React.FC<CompanyListProps> = ({ companies, onCompanySelect, onCompanyUpdate }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRisk, setFilterRisk] = useState<string>('all');
+  const [showForm, setShowForm] = useState(false);
+  const [editingCompany, setEditingCompany] = useState<Company | undefined>();
 
   const filteredCompanies = companies.filter(company => {
     const matchesSearch = company.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -46,6 +50,24 @@ const CompanyList: React.FC<CompanyListProps> = ({ companies, onCompanySelect })
     return labels[riskLevel as keyof typeof labels] || riskLevel;
   };
 
+  const handleAddCompany = () => {
+    setEditingCompany(undefined);
+    setShowForm(true);
+  };
+
+  const handleEditCompany = (company: Company) => {
+    setEditingCompany(company);
+    setShowForm(true);
+  };
+
+  const handleFormClose = () => {
+    setShowForm(false);
+    setEditingCompany(undefined);
+  };
+
+  const handleFormSave = () => {
+    onCompanyUpdate();
+  };
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('tr-TR', {
       style: 'currency',
@@ -64,6 +86,10 @@ const CompanyList: React.FC<CompanyListProps> = ({ companies, onCompanySelect })
             <h2 className="text-xl font-semibold text-gray-900">Firma Yönetimi</h2>
           </div>
           <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <button 
+            onClick={handleAddCompany}
+            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
             <Plus className="h-5 w-5" />
             <span>Yeni Firma</span>
           </button>
@@ -157,10 +183,15 @@ const CompanyList: React.FC<CompanyListProps> = ({ companies, onCompanySelect })
                   <button 
                     onClick={() => onCompanySelect(company)}
                     className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50"
+                    title="Detayları Görüntüle"
                   >
                     <Eye className="h-4 w-4" />
                   </button>
-                  <button className="text-gray-600 hover:text-gray-900 p-1 rounded hover:bg-gray-50">
+                  <button 
+                    onClick={() => handleEditCompany(company)}
+                    className="text-gray-600 hover:text-gray-900 p-1 rounded hover:bg-gray-50"
+                    title="Düzenle"
+                  >
                     <Edit className="h-4 w-4" />
                   </button>
                 </td>
@@ -176,6 +207,14 @@ const CompanyList: React.FC<CompanyListProps> = ({ companies, onCompanySelect })
           </div>
         )}
       </div>
+      
+      {showForm && (
+        <CompanyForm
+          company={editingCompany}
+          onClose={handleFormClose}
+          onSave={handleFormSave}
+        />
+      )}
     </div>
   );
 };
