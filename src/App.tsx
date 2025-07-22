@@ -16,7 +16,7 @@ import CompanyDetail from './components/Companies/CompanyDetail';
 import RiskAnalysis from './components/RiskAnalysis/RiskAnalysis';
 
 // Services
-import { authToken, companiesAPI, dashboardAPI, healthCheck } from './services/api';
+import { authToken, authAPI, companiesAPI, dashboardAPI, healthCheck } from './services/api';
 import { Company } from './types';
 
 function App() {
