@@ -14,6 +14,7 @@ import RecentAlerts from './components/Dashboard/RecentAlerts';
 import CompanyList from './components/Companies/CompanyList';
 import CompanyDetail from './components/Companies/CompanyDetail';
 import RiskAnalysis from './components/RiskAnalysis/RiskAnalysis';
+import PDFUpload from './components/DataIntegration/PDFUpload';
 
 // Services
 import { authToken, authAPI, companiesAPI, dashboardAPI, healthCheck } from './services/api';
@@ -264,14 +265,7 @@ function App() {
         
       case 'data-integration':
         return (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
-            <TrendingUp className="h-16 w-16 text-blue-600 mx-auto mb-4" />
-            <h2 className="text-2xl font-semibold text-gray-900 mb-2">Veri Entegrasyonu</h2>
-            <p className="text-gray-600 mb-6">PDF, e-defter ve diğer kaynaklardan veri yükleme modülü</p>
-            <button className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-              Yakında Gelecek
-            </button>
-          </div>
+          <PDFUpload />
         );
         
       case 'early-warning':

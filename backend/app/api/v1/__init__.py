@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1 import auth, companies, dashboard, alerts, risk_analysis
+from app.api.v1 import auth, companies, dashboard, alerts, risk_analysis, pdf_extraction
 
 api_router = APIRouter()
 
@@ -8,3 +8,4 @@ api_router.include_router(companies.router, prefix="/companies", tags=["companie
 api_router.include_router(dashboard.router, prefix="/dashboard", tags=["dashboard"])
 api_router.include_router(alerts.router, prefix="/alerts", tags=["alerts"])
 api_router.include_router(risk_analysis.router, prefix="/risk-analysis", tags=["risk-analysis"])
+api_router.include_router(pdf_extraction.router, prefix="/pdf", tags=["pdf-extraction"])
